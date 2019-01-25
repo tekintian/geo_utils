@@ -10,7 +10,7 @@
         "forum": "https://github.com/tekintian/geo_utilsa",
         "source": "https://github.com/tekintian/geo_utils"
     },
-    "version":"1.0",
+    "version":"1.1.0",
     "autoload": {
         "psr-4": {
             "tekintian\\": "src"
