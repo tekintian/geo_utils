@@ -1,0 +1,19 @@
+{
+    "name": "tekintian/geo_utils",
+    "author": [{"name":"tekintian"},{"url":"http://dev.tekin.cn"}],
+    "description": "目前最全面的地理坐标转换工具，支持GPS坐标 WGS-84，百度坐标 BD-09，国测局 火星坐标GCJ-02之间的相互转换 ",
+    "type": "library",
+    "keywords": ["GPS坐标","工具","WGS-84转换工具","百度坐标 BD-09转换工具", "国测局火星坐标GCJ-02转换工具"],
+    "homepage": "https://github.com/tekintian/pinyin_utils",
+    "license": "BSD-3-Clause",
+    "support": {
+        "forum": "https://github.com/tekintian/geo_utilsa",
+        "source": "https://github.com/tekintian/geo_utils"
+    },
+    "version":"1.0",
+    "autoload": {
+        "psr-4": {
+            "tekintian\\": "src"
+        }
+    }
+}
