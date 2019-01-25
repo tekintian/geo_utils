@@ -25,19 +25,29 @@ require_once __DIR__ . '/vendor/autoload.php';
 use \tekintian\geo_utils\GeoCoordinate;
 
 // 实例化工具
-$geo_coordinate = new GeoCoordinate();
+$geoc= new GeoCoordinate();
 
 // GPS坐标转国测局火星坐标
-echo $geo_coordinate->gpsToGcj02(25.11624,102.75205);
+echo $geoc->gpsToGcj02(25.11624,102.75205);
 
 // 国测局火星坐标转GPS坐标
-echo $geo_coordinate->gcj02ToGps(39.114347,116.82339);
+echo $geoc->gcj02ToGps(39.114347,116.82339);
+
+echo "<hr>";
+// 百度坐标 26.8807910,100.2284620 转国测局坐标
+$gcj=$geoc->bd09ToGcj02(26.8807910,100.2284620);
+echo "火星坐标：".$gcj['lat'].", ".$gcj['lng'];
+echo "<hr>";
+$gps=$geoc->gcj02ToGpsExactly($gcj['lat'],$gcj['lng']);
+echo "<br>GPS坐标：".$gps['lat'].", ".$gps['lng'];
 
 ~~~
-
-
 
 ## sources
  * 更多坐标信息请查看相关官方文档
  * 腾讯坐标 https://lbs.qq.com/webservice_v1/guide-convert.html
  * 百度坐标 http://lbsyun.baidu.com/index.php?title=webapi/guide/changeposition
+ * 百度坐标拾取反查 http://api.map.baidu.com/lbsapi/getpoint/index.html
+ * 高德坐标拾取反查 https://lbs.amap.com/console/show/picker
+ * GPS坐标反查【需要翻墙】 http://geohash.org/
+ 

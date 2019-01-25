@@ -8,12 +8,14 @@ namespace tekintian\geo_utils;
  * WGS-84：是国际标准，GPS坐标（Google Earth使用、或者GPS模块）
  * GCJ-02：中国坐标偏移标准，Google Map、高德、腾讯使用
  * BD-09：百度坐标偏移标准，Baidu Map使用
- * Web Mercator 网络墨卡托投影坐标，Web Mercator是一个投影坐标系统，其基准面是 WGS 1984 ;  EPSG，即 European Petroleum Standards Group 欧洲石油标准组织
+ * Web Mercator 网络墨卡托投影坐标，Web Mercator是一个投影坐标系统，其基准面是 WGS 1984 ; 
  * 
  * 更多坐标信息请查看相关官方文档
  * 腾讯坐标 https://lbs.qq.com/webservice_v1/guide-convert.html
  * 百度坐标 http://lbsyun.baidu.com/index.php?title=webapi/guide/changeposition
- * 
+ * 百度坐标拾取反查 http://api.map.baidu.com/lbsapi/getpoint/index.html
+ * 高德坐标拾取反查 https://lbs.amap.com/console/show/picker
+ * GPS坐标反查【需要翻墙】 http://geohash.org/
  * @Author: tekintian
  * @Date:   2019-01-25 14:36:30
  * @Last Modified 2019-01-25
@@ -93,11 +95,13 @@ class GeoCoordinate
     /**
      * 国测局坐标转百度坐标
      * GCJ-02 to BD-09
-     * @param  [type] $gcj_lat [description]
-     * @param  [type] $gcj_lng [description]
+     * 中国正常坐标GCJ-02(火星，高德) 坐标转换成 BD-09(百度) 坐标
+     * 腾讯地图用的也是GCJ02坐标
+     * @param  [double] $gcj_lat [纬度]
+     * @param  [double] $gcj_lng [经度]
      * @return [type]         [description]
      */
-    public function gcjToBdEncrypt($gcj_lat, $gcj_lng) {
+    public function gcj02ToBd09($gcj_lat, $gcj_lng) {
         $x = $gcj_lng; $y = $gcj_lat;  
         $z = sqrt($x * $x + $y * $y) + 0.00002 * sin($y * $this->x_pi);  
         $theta = atan2($y, $x) + 0.000003 * cos($x * $this->x_pi);  
@@ -108,11 +112,12 @@ class GeoCoordinate
     /**
      * 百度坐标转国测局坐标
      * BD-09 to GCJ-02
-     * @param  [type] $bd_lat [description]
-     * @param  [type] $bd_lng [description]
+     * BD-09(百度) 坐标转换成  GCJ-02(火星，高德) 坐标
+     * @param  [type] $bd_lat [百度纬度]
+     * @param  [type] $bd_lng [百度经度]
      * @return [type]        [description]
      */
-    public function bdTogcj02ToGps($bd_lat, $bd_lng)
+    public function bd09ToGcj02($bd_lat, $bd_lng)
     {
         $x = $bd_lng - 0.0065; $y = $bd_lat - 0.006;  
         $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $this->x_pi);  
@@ -287,7 +292,7 @@ class GeoCoordinate
         for ($i = 0; $i < count($region); $i++)
             if ($this->isInRect($region[$i], $lng, $lat))
             {
-                for ($j = 0; $j < count($exclude); j++)
+                for ($j = 0; $j<count($exclude); $j++)
                     if ($this->isInRect($exclude[$j], $lng, $lat))
                         return false;
                 return true;
@@ -334,75 +339,5 @@ class GeoCoordinate
         $ret += (150.0 * sin($x / 12.0 * $this->PI) + 300.0 * sin($x / 30.0 * $this->PI)) * 2.0 / 3.0;
         return $ret;
     }
-    /**
-	 * 中国正常GCJ02坐标---->百度地图BD09坐标
-	 * 腾讯地图用的也是GCJ02坐标
-	 * @param double $lat 纬度
-	 * @param double $lng 经度
-	 */
-	public function convertGCJ02ToBD09($lat,$lng){
-	    $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-	    $x = $lng;
-	    $y = $lat;
-	    $z =sqrt($x * $x + $y * $y) + 0.00002 * sin($y * $x_pi);
-	    $theta = atan2($y, $x) + 0.000003 * cos($x * $x_pi);
-	    $lng = $z * cos($theta) + 0.0065;
-	    $lat = $z * sin($theta) + 0.006;
-	    return array('lng'=>$lng,'lat'=>$lat);
-	}
-	/**
-	 * 百度地图BD09坐标---->中国正常GCJ02坐标
-	 * 腾讯地图用的也是GCJ02坐标
-	 * @param double $lat 纬度
-	 * @param double $lng 经度
-	 * @return array();
-	 */
-	public function convertBD09ToGCJ02($lat,$lng){
-	    $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-	    $x = $lng - 0.0065;
-	    $y = $lat - 0.006;
-	    $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
-	    $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
-	    $lng = $z * cos($theta);
-	    $lat = $z * sin($theta);
-	    return array('lng'=>$lng,'lat'=>$lat);
-	}
-    /**
-     * GCJ-02(火星，高德) 坐标转换成 BD-09(百度) 坐标
-     * [gcj02ToBD09 description]
-     * @param  [type] $bd_lat [百度纬度]
-     * @param  [type] $bd_lng [百度经度]
-     * @return [type]         [description]
-     */
-    public function gcj02ToBD09($gg_lat,$gg_lng) {
 
-        $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-        $x = $gg_lng;
-        $y = $gg_lat;
-        $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
-        $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
-        $data['bd_lng'] = $z * cos($theta) + 0.0065;
-        $data['bd_lat'] = $z * sin($theta) + 0.006;
-
-        return $data;
-    }
-
-   
-	/**
-	 * BD-09(百度) 坐标转换成  GCJ-02(火星，高德) 坐标
-	 * @param  [type] $bd_lat [百度纬度]
-     * @param  [type] $bd_lng [百度经度]
-	 * @return [type]         [description]
-	 */
-    public function bd09ToGCJ02($bd_lat,$bd_lng) {
-        $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-        $x = $bd_lng - 0.0065;
-        $y = $bd_lat - 0.006;
-        $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
-        $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
-        $data['gg_lng'] = $z * cos($theta);
-        $data['gg_lat'] = $z * sin($theta);
-
-        return $data;
-    }
 }
