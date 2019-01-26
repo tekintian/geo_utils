@@ -18,7 +18,7 @@ namespace tekintian\geo_utils;
  * GPS坐标反查【需要翻墙】 http://geohash.org/
  * @Author: tekintian
  * @Date:   2019-01-25 14:36:30
- * @Last Modified 2019-01-25
+ * @Last Modified 2019-01-26
  */
 class GeoCoordinate
 {
@@ -125,6 +125,20 @@ class GeoCoordinate
         $gcj_lng = $z * cos($theta);
         $gcj_lat = $z * sin($theta);
         return array('lat' => $gcj_lat, 'lng' => $gcj_lng);
+    }
+    /**
+     * 百度bd-09坐标转为 gps wgs-84坐标
+     * 
+     * 使用工具 \tekintian\geo_utils\GeoCoordinate
+     * @param  [type] $bd_lat [百度纬度]
+     * @param  [type] $bd_lng [百度经度]
+     * @return [array]      [GPS经纬度坐标数组]
+     */
+    public function bd09ToGps($bd_lat,$bd_lng)
+    {
+        $_gcj=$this->bd09ToGcj02($bd_lat,$bd_lng);
+        $gps=$this->gcj02ToGpsExactly($_gcj['lat'],$_gcj['lng']);
+        return $gps;
     }
     /**
      * WGS-84 to Web mercator
